@@ -7,9 +7,10 @@ func TestChallenge10(t *testing.T) {
 	b := []byte("TESTINGTHISSHIET")
 	c := []byte("RANDOMWORDFORSHT")
 
+	t.Log(c)
 	val := CBC_encode(a,b,c)
 	t.Log(val)
 	val2 := CBC_decode(a,b,val)
-	t.Log(string(val2))
+	t.Log(val2)
 
 }

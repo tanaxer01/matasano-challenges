@@ -5,34 +5,39 @@ import "Matasano/set1"
 
 func CBC_encode(key []byte, iv []byte, plain []byte) []byte {
 	ret := make([]byte, len(plain))
+	tmp := make([]byte, 16)
 
-	var temp []byte
 	for i := 0; i < len(plain); i += 16 {
+		/*
 		if i == 0 {
-			temp = set1.AES_encode(key,iv)
+			tmp = set1.Xor_Bytes(plain[i:i+16],iv) 
 		} else {
-			temp = set1.AES_encode(key, ret[i-16:i])
+			tmp = set1.Xor_Bytes(plain[i:i+16],ret[i-16:i]) 
 		}
+		*/
 
-		for j := 0; j < 16; j++ { ret[j] = temp[j] }
+		tmp  = set1.AES_encode(key, tmp)
+		for j := 0; j < 16; j++ { ret[i+j] = tmp[j] }
 	}
-
-	return ret
+	
+	return ret 
 }
 
 func CBC_decode(key []byte, iv []byte, cipher []byte) []byte {
 	ret := make([]byte, len(cipher))
+	tmp := make([]byte, 16) 
 
-	var temp []byte
-	for i := len(cipher); i > 0 ; i -= 16 {
+	for i := 0; i < len(cipher); i += 16 {
+		/*
 		if i == 0 {
-			temp = set1.AES_decode(key,iv)
+			tmp = set1.Xor_Bytes(tmp, iv)
 		} else {
-			temp = set1.AES_encode(key, ret[i-16:i])
+			tmp = set1.Xor_Bytes(tmp, cipher[i-16:i])
 		}
-
-		for j := 0; j < 16; j++ { ret[i-j] = temp[i-j] }
+		*/
+		tmp = set1.AES_decode(key, cipher[:16])
+		for j := 0; j < 16; j++ { ret[j] = tmp[j] }
 	}
 
-	return ret
+	return ret 
 }
