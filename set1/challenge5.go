@@ -8,7 +8,7 @@ func RepeatingKeyXor(key string, input string) string {
 	for i:=0;i<len(ints)/len(key);i++ { intsKey = append(intsKey,[]byte(key)...) }
 	intsKey = append(intsKey,[]byte(key)[:len(ints)%len(key)]...)
 
-	var xored []byte = Xor_Bytes(ints,intsKey)
+	var xored string = XOR_Hex(ints,intsKey)
 	
-	return string(xored)
+	return xored
 }

@@ -3,11 +3,16 @@ package set1
 import "encoding/hex"
 
 
-func Xor_Bytes(A []byte, B []byte) []byte {
-	dst := make([]byte, hex.EncodedLen(len(A)))
+func XOR_Bytes(A []byte, B []byte) []byte {
+	dst := make([]byte, len(A))
+	for i:=0;i<len(A);i++ { dst[i] =  A[i] ^ B[i] }
 	
-	for i:=0;i<len(A);i++ { A[i] ^= B[i] }
-	_ =  hex.Encode(dst,A)
-
 	return dst
+}
+	
+func XOR_Hex(A []byte, B []byte) string {
+	dst := make([]byte, hex.EncodedLen(len(A)))
+	_ =  hex.Encode(dst, XOR_Bytes(A, B))
+
+	return string(dst)
 }
