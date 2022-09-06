@@ -1,6 +1,7 @@
 package set2
 
 import (
+	"Matasano/set1"
 	"testing"
 	"strings"
 	"bufio"
@@ -8,17 +9,25 @@ import (
 )
 
 func TestChallenge10(t *testing.T) {
+	var key  string = "YELLOW SUBMARINE"
 	var path string = "test_data/10.txt"
 
+	iv := make([]byte, 16)
+	for i := 0; i < 16; i++ { iv[i] = 0x00 }
 
-	a := []byte("YELLOW SUBMARINE")
-	b := []byte("TESTINGTHISSHIET")
-	c := []byte("RANDOMWORDFORSHT")
+	fd, _ := os.Open(path)
+	defer fd.Close()
 
-	t.Log(c)
-	val := CBC_encode(a,b,c)
-	t.Log(val)
-	val2 := CBC_decode(a,b,val)
-	t.Log(string(val2))
+	var input string = ""
+	scanner := bufio.NewScanner(fd)
+	for scanner.Scan() { input += strings.TrimSuffix(scanner.Text(),"\n") }
+
+	var input_decoded = []byte(set1.B642Hex(input))
+
+	deco := CBC_decode([]byte(key), iv, input_decoded)
+	t.Log("Output 1 => ", string(deco))
+
+	enco := CBC_encode([]byte(key), iv, deco)
+	t.Log("Output 2 => ", string(enco) == string(input_decoded))
 
 }
