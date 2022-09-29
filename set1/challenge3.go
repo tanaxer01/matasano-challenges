@@ -1,11 +1,11 @@
 package set1
 
 import (
-	"encoding/hex"
+	"Matasano/utils"
 	"strings"
 )
 
-func Score(word string) float32 {
+func Score(word string) (score float32) {
 	word = strings.ToLower(word)
 	freq := map[string]float32 {
 		"a": .08167, "b": .01492, "c": .02782, "d": .04253,
@@ -17,33 +17,24 @@ func Score(word string) float32 {
 		"y": .01974, "z": .00074, " ": .13000,
 	}
 
-	var score float32 = 0
 	for i := 0; i < len(word); i++ {
 		value, present := freq[ string(word[i]) ]
-		if present {
-			score += value
-		}
+		if present { score += value }
+
 	}
 
-	return score
+	return
 }
 
 func Xor_cipher(input string) (output string, char int, maximo float32) {
-	ints, _ := hex.DecodeString(input)
-	output = ""
-	maximo = 0
-	char   = 0
+	ints := utils.From_hex(input)
+	curr := make([]byte,len(ints))
 
 	for i := 0; i<256; i++ {
-		curr := make([]byte,len(ints))
 		for j:=0; j < len(curr); j++ { curr[j] = ints[j] ^ byte(i) }
 		score := Score( string(curr) )
 
-		if score > maximo {
-			maximo = score
-			char   = i
-			output = string(curr)
-		}
+		if score > maximo { output, maximo, char = string(curr), score, i }
 	}
 
 	return

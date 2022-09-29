@@ -1,13 +1,24 @@
 package set2
-/*
+
 import (
-	"Matasano/set1"
+	"Matasano/utils"
 	"math/rand"
 	"time"
 )
-*/
 
 func EncryptionOracle(input []byte) []byte {
+	rand.Seed(time.Now().Unix())
+
+	/*
+	key := utils.RandomBytes(16) 
+	iv  := utils.RandomBytes(16)
+	*/
+
+	pre := utils.RandomBytes( utils.RandomInt(5,10) )
+	pos := utils.RandomBytes( utils.RandomInt(5,10) )
+	end := utils.PKCS7(append(append(pre, input...), pos...), 16 * (1+(len(input)/16)) )
+
+	return end
 	/*
 	rand.Seed(time.Now().UnixNano())
 
@@ -30,7 +41,7 @@ func EncryptionOracle(input []byte) []byte {
 	}
 
 	*/
-	return []byte{} 
+
 }
 
 

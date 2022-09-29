@@ -1,27 +1,13 @@
 package set1
 
-import (
-	"bufio"
-	"os"
-)
+import "Matasano/utils"
 
 func DetectXor(path string) (word string){
-	fd, _  := os.Open(path)
-	defer fd.Close()
-
-	scanner := bufio.NewScanner(fd)
-	 word = ""
 	var maxScore float32 = 0
-	
-	for scanner.Scan() {
-		line := scanner.Text()
 		
+	for _, line := range utils.ReadLines(path) {
 		curr, _, score := Xor_cipher(line)
-		
-		if score > maxScore {
-			maxScore = score
-			word = curr
-		}
+		if score > maxScore { maxScore, word = score, curr }
 	}
 
 	return

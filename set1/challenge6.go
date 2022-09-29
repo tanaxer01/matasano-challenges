@@ -1,11 +1,6 @@
 package set1
 
-import (
-	"encoding/hex"
-	"strings"
-	"bufio"
-	"os"
-)
+import "Matasano/utils"
 
 func CountOnes(word []byte) int {
 	var count int = 0
@@ -40,15 +35,8 @@ func CalcScore(num int, encoded []byte) float32 {
 
 func BreakRepetingKeyXor(path string) (KEY string,TEXT string) {
 	//1. Fetch input
-	fd, _ := os.Open(path)
-	defer fd.Close()
-
-	var input string = ""
-	
-	scanner := bufio.NewScanner(fd)
-	for scanner.Scan() { input += strings.TrimSuffix(scanner.Text(),"\n") }
-
-	var input_decoded = []byte(B642Hex(input))
+	var input = utils.ReadFile(path)
+	var input_decoded = utils.From_base64(input)
 
 	// 2. Calc KEYSIZE
 	var KEYSIZE int
@@ -56,12 +44,7 @@ func BreakRepetingKeyXor(path string) (KEY string,TEXT string) {
 	
 	for i:=2;i < 42;i++ {
 		curr := CalcScore(i,input_decoded)
-
-		if curr < promedio || promedio == 0 {
-			promedio = curr
-			KEYSIZE  = i
-		}
-
+		if curr < promedio || promedio == 0 { promedio, KEYSIZE = curr, i }
 	}
 
 	//2. -> CalcHamming
@@ -69,21 +52,14 @@ func BreakRepetingKeyXor(path string) (KEY string,TEXT string) {
 
 	for i := 0; i < KEYSIZE; i++ {
 		temp := make([]byte, len(input_decoded)/KEYSIZE + 1)
-		for j := i; j < len(input_decoded); j += KEYSIZE {
-			temp[j/KEYSIZE] = input_decoded[j]
-		}
+		for j := i; j < len(input_decoded); j += KEYSIZE { temp[j/KEYSIZE] = input_decoded[j] }
 
-		_, char, _ := Xor_cipher(hex.EncodeToString(temp))
+		_, char, _ := Xor_cipher( string(utils.To_hex(temp)) )
 		byte_key[i] = byte(char)  
 	}
 
 	KEY  = string(byte_key)
-	temp_text, _ := hex.DecodeString(RepeatingKeyXor(KEY, string(input_decoded)))
-
-	TEXT = string(temp_text)
+	TEXT = string( utils.From_hex( RepeatingKeyXor(KEY, string(input_decoded)) ) )
 
 	return 
-
-	//3. -> Calc smallest normalized edit distance
-	
 }

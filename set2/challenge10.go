@@ -1,6 +1,9 @@
 package set2
 
-import "Matasano/set1"
+import (
+	"Matasano/utils"
+	"Matasano/set1"
+)
 
 func CBC_encode(key []byte, iv []byte, plain []byte) []byte {
 	ret := make([]byte, len(plain))
@@ -9,7 +12,7 @@ func CBC_encode(key []byte, iv []byte, plain []byte) []byte {
 	aux := iv
 
 	for i := 0; i < len(plain); i += 16 {
-		tmp = set1.XOR_Bytes(aux, plain[i:i+16])
+		tmp = utils.XOR(aux, plain[i:i+16])
 		tmp = set1.AES_encode(key, tmp)
 
 		aux = tmp
@@ -27,7 +30,7 @@ func CBC_decode(key []byte, iv []byte, cipher []byte) []byte {
 
 	for i := 0; i < len(cipher); i += 16 {
 		tmp = set1.AES_decode(key, cipher[i:i+16])
-		tmp = set1.XOR_Bytes(tmp, aux)
+		tmp = utils.XOR(tmp, aux)
 
 		aux = cipher[i:i+16]
 		for j := 0; j < 16; j++ { ret[i+j] = tmp[j] }
