@@ -17,26 +17,27 @@ def keysize_edit_distance(data: bytes, keysize: int) -> float:
 
     return sum(distances) / chunk_cant 
 
-#def break_repeating_key_xor(text: bytes, key: bytes) -> bytes:
-#    return b""
-
-if __name__ == "__main__":
-    # 1.
+def break_repeating_key_xor(text: bytes) -> str:
     POSIBLE_KEYSIZES = range(2,41)
-    # 2.
+    key_size = min(POSIBLE_KEYSIZES, key=lambda x: keysize_edit_distance(text, x))
+
+    transposed = map(lambda x: text[x::key_size], range(key_size))
+    solved_blocks = map(break_xor_cipher,transposed)
+
+    return "".join( map(lambda x: chr(x[1]), solved_blocks) )
+
+def main():
+    # Hamming distance
     test_dist = hamming_distance(b"this is a test", b"wokka wokka!!!")
     assert test_dist == 37
     
     with open("input/ch06.txt", "r") as file:
         data = base64.b64decode("".join([ i.rstrip() for i in file.readlines() ]))
-
-    key_size = min(POSIBLE_KEYSIZES, key=lambda x: keysize_edit_distance(data, x))
-
-    data_blocks = map(lambda x: data[x:x+key_size], range(0, len(data), key_size))
-    transposed_blocks = map(lambda x: data[x::key_size], range(key_size))
-
-    solved_blocks = map(break_xor_cipher,transposed_blocks)
-    key = "".join( map(lambda x: chr(x[1]), solved_blocks) )
-    print(key)
+        key = break_repeating_key_xor(data)
+        print("challenge 6:\t", key)
 
     decrypted_data = repeating_key_xor(data, key.encode())
+    #print(decrypted_data)
+
+if __name__ == "__main__":
+    main()

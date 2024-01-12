@@ -34,10 +34,12 @@ def break_xor_cipher(ciphered: bytes) -> Tuple[str, int, float]:
 
     return max_str, max_chr, max_score
 
-if __name__ == "__main__": 
+def main():
     hex = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
     hex_bytes = bytes.fromhex(hex)
 
     text, _, _ = break_xor_cipher(hex_bytes)
     print("challenge 03:\t", text)
 
+if __name__ == "__main__": 
+    main()

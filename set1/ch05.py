@@ -1,4 +1,3 @@
-from ch02 import xor
 from itertools import cycle
 
 def repeating_key_xor(text: bytes, key: bytes) -> bytes:
@@ -9,7 +8,7 @@ def repeating_key_xor(text: bytes, key: bytes) -> bytes:
 
     return output
 
-if __name__ == "__main__":
+def main():
     text = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
     key = "ICE"
 
@@ -19,5 +18,7 @@ if __name__ == "__main__":
 
     assert xor_bytes.hex() == res
 
-    print("challenge 5:", text)
+    print("challenge 5:\t", text)
 
+if __name__ == "__main__":
+    main()
