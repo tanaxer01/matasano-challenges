@@ -9,9 +9,7 @@ def find_xored_line(file: str) -> str:
 
     return xored_line
 
-def main():
-    xored_line = find_xored_line("input/ch04.txt")
-    print("challenge 4:\t", xored_line)
-
 if __name__ == "__main__":
-    main()
+    xored_line = find_xored_line("input/ch04.txt")
+    print("challenge 3:\n\t", xored_line)
+

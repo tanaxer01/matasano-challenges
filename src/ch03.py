@@ -2,8 +2,6 @@ from collections import Counter
 from typing import Tuple
 
 def english_score(text: str) -> float:
-    score = 0
-    freqs = Counter(text)
     values = {
         'a': 0.08167, 'b': 0.01492, 'c': 0.02782, 'd': 0.04253, 'e': 0.12702,
         'f': 0.02228, 'g': 0.02015, 'h': 0.06094, 'i': 0.06094, 'j': 0.00153,
@@ -13,6 +11,7 @@ def english_score(text: str) -> float:
         'z': 0.00074, ' ': 0.13000
     }
 
+    score = 0
     for letter, freq in Counter(text).items():
         if letter.lower() in values:
             score += values[letter.lower()] * freq
@@ -34,12 +33,10 @@ def break_xor_cipher(ciphered: bytes) -> Tuple[str, int, float]:
 
     return max_str, max_chr, max_score
 
-def main():
+if __name__ == "__main__": 
     hex = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
     hex_bytes = bytes.fromhex(hex)
 
     text, _, _ = break_xor_cipher(hex_bytes)
-    print("challenge 03:\t", text)
+    print("challenge 3:\n\t", text)
 
-if __name__ == "__main__": 
-    main()

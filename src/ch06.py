@@ -1,6 +1,6 @@
-import base64
 from ch03 import break_xor_cipher
 from ch05 import repeating_key_xor
+import base64
 
 def hamming_distance(a: bytes, b: bytes) -> int:
     total = 0
@@ -26,18 +26,16 @@ def break_repeating_key_xor(text: bytes) -> str:
 
     return "".join( map(lambda x: chr(x[1]), solved_blocks) )
 
-def main():
-    # Hamming distance
+if __name__ == "__main__":
     test_dist = hamming_distance(b"this is a test", b"wokka wokka!!!")
     assert test_dist == 37
     
     with open("input/ch06.txt", "r") as file:
         data = base64.b64decode("".join([ i.rstrip() for i in file.readlines() ]))
         key = break_repeating_key_xor(data)
-        print("challenge 6:\t", key)
+        print("challenge 6:\n\t", key)
 
     decrypted_data = repeating_key_xor(data, key.encode())
     #print(decrypted_data)
 
-if __name__ == "__main__":
-    main()
+

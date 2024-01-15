@@ -18,7 +18,8 @@ def main():
 
     assert xor_bytes.hex() == res
 
-    print("challenge 5:\t", text)
+    print("challenge 5:")
+    print(*[ "\t"+i for i in text.split("\n") ], sep="\n")
 
 if __name__ == "__main__":
     main()
