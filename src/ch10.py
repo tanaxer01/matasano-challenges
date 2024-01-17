@@ -1,5 +1,4 @@
 from Crypto.Cipher import AES
-from ch02 import xor
 from ch09 import pkcs7
 import base64
 

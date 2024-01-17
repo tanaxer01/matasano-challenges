@@ -30,38 +30,36 @@ def valid_padding(ct: bytes) -> bool:
     except AssertionError:
         return False
 
-def filtrate_single_byte(pad_num: int) -> int:
-    ct  = oracle_17()
-    c2  = list()
-    res = None
+def filtrate_block(ct: bytes) -> bytes:
+    zero = [ 0 for _ in range(16) ]
 
-    for j in range(1, 256):
-        mod = b"\x00"*15 + bytes([j])
-        pad = b"\x00"*(len(ct)//16 - 32) + mod + b"\x00"*16
-        print(pad.hex())
+    for idx in range(1, 17):
+        pad  = [ i ^ idx for i in zero ]
 
-        xored_ct = xor(ct, pad)
+        for num in range(256):
+            pad[-idx] = num
+            mask = bytes(pad).ljust(32, b"\x00")
 
-        if valid_padding(xored_ct):
-            c2.append(j ^ ct[-16])
-            res = j ^ ct[-16]
-            break
+            if valid_padding( xor(ct, mask) ):
+                # Check for false positives with \x01 pad
+                if idx == 1:
+                    pad[14] ^= 1
+                    mask = bytes(pad).ljust(32, b"\x00")
 
+                    if not valid_padding( xor(ct, mask) ):
+                        continue
 
-    assert res != None
-    return res
+                zero[-idx] = num ^ idx
+                break
 
+    return bytes(zero)
 
 if __name__ == "__main__":
     KEY = get_random_bytes(16)
     IV  = get_random_bytes(16)
 
-    ct  = oracle_17()
-    #a = aaa(len(ct)//16)
+    print("===")
+    ct  = IV + oracle_17()
+    pt  = b"".join(filtrate_block(ct[i:i+32]) for i in range(0, len(ct), 16))
 
-    print( filtrate_single_byte(1) )
-    print( chr(filtrate_single_byte(1)) )
-
-
-
-
+    print("challenge 17:\n\t", pt)

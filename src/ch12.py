@@ -1,4 +1,3 @@
-
 from Crypto.Random import get_random_bytes
 from typing import Tuple
 from ch07 import ECB_encrypt
