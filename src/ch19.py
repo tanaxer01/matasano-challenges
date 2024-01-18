@@ -1,6 +1,9 @@
 from typing import List
 from Crypto.Random import get_random_bytes
 from ch02 import xor
+from ch03 import break_xor_cipher
+from ch05 import repeating_key_xor
+from ch06 import break_repeating_key_xor
 from ch18 import CRT_encrypt 
 import base64
 import math
@@ -49,22 +52,36 @@ lines = [
 ]
 
 def encrypt_lines() -> List[bytes]:
-    cts = map(lambda x: CRT_encrypt(base64.b64decode(x), KEY, b"\x00"), lines)
-    return list(cts)
-
-def break_line(ct: bytes):
-    keystream = b"".join([ i.to_bytes(8,"little").rjust(16,b"\x00") for i in range( math.ceil(len(ct)/16) ) ])
-
-
-    print(xor(ct, keystream[:len(ct)]))
-    
+    ct_lines = map(lambda x: CRT_encrypt(base64.b64decode(x), KEY, b"\x00"), lines)
+    return list(ct_lines)
 
 if __name__ == "__main__":
     KEY = get_random_bytes(16)
-    cts = encrypt_lines()
+    ct_lines = encrypt_lines()
 
-    break_line(cts[0])
+    '''
+    splitted_lines = [ [ line[i:i+16] for i in range(0, len(line), 16) ] for line in ct_lines ]
+    max_cnter = max(splitted_lines, key=lambda x: len(x))
 
+    blocks_by_cntr = [ b"".join( line[i] for line in splitted_lines if len(line) > i ) for i in range( len(max_cnter) ) ]
+    tposed_by_cntr = [ [ line[i::16] for i in range(16) ] for line in blocks_by_cntr ]
+    solved_by_cntr = [ map(break_xor_cipher, i) for i in tposed_by_cntr ]
 
+    key = b"".join( bytes( j[1] for j in i ) for i in solved_by_cntr )
+
+    print(len(key))
+
+    for line in ct_lines:
+        a = xor(key[:len(line)], line)
+        print("\t", [ a[i:i+16] for i in range(0,len(a),16) ])
+    '''
+
+    blocks = b"".join( line[16:32] for line in ct_lines )
+    tposed = [ blocks[i::16] for i in range(16) ]
+    solved = [ break_xor_cipher(i) for i in tposed ]
+
+    #print(*[ (blocks[i:i+16].hex(), j.hex()) for i, j in zip(range(0,len(blocks),16), tposed) ], sep="\n")
+    print(solved)
+    
 
 

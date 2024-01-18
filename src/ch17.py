@@ -61,5 +61,6 @@ if __name__ == "__main__":
     print("===")
     ct  = IV + oracle_17()
     pt  = b"".join(filtrate_block(ct[i:i+32]) for i in range(0, len(ct), 16))
+    res = filter(lambda x: pt[:6] in base64.b64decode(x), options)
 
-    print("challenge 17:\n\t", pt)
+    print("challenge 17:\n\t", pt, "\n\t", base64.b64decode(next(res)))
