@@ -1,10 +1,8 @@
-from typing import List
 from Crypto.Random import get_random_bytes
 from ch02 import xor
 from ch03 import break_xor_cipher
-from ch05 import repeating_key_xor
-from ch06 import break_repeating_key_xor
 from ch18 import CRT_encrypt 
+from typing import List
 import base64
 import math
 
@@ -55,33 +53,25 @@ def encrypt_lines() -> List[bytes]:
     ct_lines = map(lambda x: CRT_encrypt(base64.b64decode(x), KEY, b"\x00"), lines)
     return list(ct_lines)
 
+def break_fixed_nonce_crt(ct: List[bytes]) -> List[bytes]:
+    pt = [ b"" for i in ct ]
+    min_len = min(map(len, ct))
+    for i in range(min_len):
+        column = bytes( l[i] for l in ct if len(l) > i )
+        solved = break_xor_cipher(column)[0]
+
+        for idx, line in enumerate(ct):
+            if len(line) > i:
+                pt[idx] += solved[0].encode()
+                solved   = solved[1:]
+            
+    return pt
+
+
 if __name__ == "__main__":
     KEY = get_random_bytes(16)
-    ct_lines = encrypt_lines()
+    ct = encrypt_lines()
+    pt = break_fixed_nonce_crt(ct)
 
-    '''
-    splitted_lines = [ [ line[i:i+16] for i in range(0, len(line), 16) ] for line in ct_lines ]
-    max_cnter = max(splitted_lines, key=lambda x: len(x))
-
-    blocks_by_cntr = [ b"".join( line[i] for line in splitted_lines if len(line) > i ) for i in range( len(max_cnter) ) ]
-    tposed_by_cntr = [ [ line[i::16] for i in range(16) ] for line in blocks_by_cntr ]
-    solved_by_cntr = [ map(break_xor_cipher, i) for i in tposed_by_cntr ]
-
-    key = b"".join( bytes( j[1] for j in i ) for i in solved_by_cntr )
-
-    print(len(key))
-
-    for line in ct_lines:
-        a = xor(key[:len(line)], line)
-        print("\t", [ a[i:i+16] for i in range(0,len(a),16) ])
-    '''
-
-    blocks = b"".join( line[16:32] for line in ct_lines )
-    tposed = [ blocks[i::16] for i in range(16) ]
-    solved = [ break_xor_cipher(i) for i in tposed ]
-
-    #print(*[ (blocks[i:i+16].hex(), j.hex()) for i, j in zip(range(0,len(blocks),16), tposed) ], sep="\n")
-    print(solved)
+    print("challenge 19:", *[ i.decode() for i in pt ][:5], sep="\n\t")
     
-
-
