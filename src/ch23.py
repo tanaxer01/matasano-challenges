@@ -1,38 +1,48 @@
-from ch21 import MT19937, as_int32
+from ch21 import MT19937
 from time import time
 
+def inverse_right_shift(y: int, shift: int, num: int = 0xFFFFFFFF) -> int:
+    mask   = (1 << shift) - 1 << (32 - shift)
+    chunks = (32 + shift - 1) // shift
 
-def inverse_right_shift(y: int, shift: int) -> int:
-    mask = (1 << shift) - 1 << (32 - shift)
+    for _ in range(0, chunks):
+        y ^= (y >> shift) & mask & num 
+        mask >>= shift
 
-    print(mask)
-    print((32 + shift - 1) // shift )
-    
+    return y
 
+def inverse_left_shift(y: int, shift: int, num: int = 0xFFFFFFFF) -> int:
+    mask   = (1 << shift) - 1
+    chunks = (32 + shift - 1) // shift
+
+    for _ in range(0, chunks):
+        y ^= (y << shift) & mask & num
+        mask <<= shift
 
     return y
 
 def untemper(y: int) -> int:
-    y ^= (y >> MT19937.l)
+    y = inverse_right_shift(y, MT19937.l)
+    y = inverse_left_shift(y, MT19937.t, MT19937.c)
+    y = inverse_left_shift(y, MT19937.s, MT19937.b)
+    y = inverse_right_shift(y, MT19937.u, MT19937.d)
 
-    y ^= ((y >> MT19937.t) & MT19937.c)
-    y ^= ((y >> MT19937.s) & MT19937.b)
-    y ^= ((y << MT19937.u) & MT19937.d)
-
-    return as_int32(y)
-
+    return y 
 
 
 if __name__ == "__main__":
     prng = MT19937(int(time()))
 
-    rand_bytes     = [ prng.extract_number() for _ in range(MT19937.n) ]
-    untemped_bytes = map(untemper, rand_bytes)
+    rand_bytes = [ prng.extract_number() for _ in range(MT19937.n) ]
+    untemped   = map(untemper, rand_bytes)
 
-    #print(list(untemped_bytes)[:5])
-    a = rand_bytes[0]
-    inverse_right_shift(a, MT19937.u)
+    cloned_prng = MT19937(0)
+    cloned_prng.MT = list( untemped )
 
+    a = prng.extract_number()
+    b = cloned_prng.extract_number()
 
+    assert a == b
 
+    print("challenge 23:\n\tnext num -> ", a, "==", b)
 
