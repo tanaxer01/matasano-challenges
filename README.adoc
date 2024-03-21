@@ -1,0 +1,14 @@
+= Matasano challenges 
+
+My solutions for the https://cryptopals.com/[Cryptopals crypto challenges].
+
+Main branch is written in Go, but I also solved some challenges using python in the python branch.
+
+== How to run?
+
+For now you can only run the hole thing. In the future I may add some fancy way of choosing sets 
+or challenges.
+
+```
+go run .
+```
