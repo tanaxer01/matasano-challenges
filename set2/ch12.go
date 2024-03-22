@@ -13,7 +13,7 @@ func Oracle12(input []byte) []byte {
 	return set1.ECBEncrypt(plaintext, KEY)
 }
 
-func calcPaddingLength() (int, int) {
+func calcPaddingLen() (int, int) {
 	var padding string = ""
 
 	empty_length := len(Oracle12([]byte(padding)))
@@ -21,25 +21,74 @@ func calcPaddingLength() (int, int) {
 		padding = padding + "A"
 	}
 
-	return len(padding), empty_length
+	return empty_length, len(padding)
+}
+
+func matchByte(filler []byte, plain []byte, offset int) string {
+	options := make(map[string]byte)
+	pt := append(filler, plain...)
+	for i := 0; i < 256; i++ {
+		possiblePt := append(pt, byte(i))
+		ct := Oracle12(possiblePt)
+
+		options[string(ct[offset:offset+16])] = byte(i)
+	}
+
+	ct := Oracle12(filler)
+	if val, ok := options[string(ct[offset:offset+16])]; ok {
+		return string(val)
+	}
+
+	return ""
+}
+
+func Byte2ByteDecrypt(targetLen int) string {
+	var block string
+	var plain string
+
+	for i := 0; i < targetLen; i += 16 {
+		filler := strings.Repeat("B", 15)
+
+		for j := 0; j < 16; j++ {
+			if len(plain)+len(block) == targetLen {
+				break
+			}
+
+			letter := matchByte([]byte(filler), []byte(plain), i)
+			if letter == "" {
+				log.Fatalf("matchOneByte didn't find any match")
+			}
+
+			plain += letter
+			if len(filler) > 0 {
+				filler = filler[1:]
+			}
+		}
+	}
+
+	return plain
 }
 
 func Challenge12() {
 	RandomBytes(KEY)
 
-	paddingLength, Length := calcPaddingLength()
-	neededPad := strings.Repeat("A", paddingLength)
+	// 1. Discover the block size of the cipher. You know it, but do this step anyway.
+	targetLen, paddingLen := calcPaddingLen()
+	padding := []byte(strings.Repeat("A", paddingLen))
 
-	blockSize := len(Oracle12([]byte(neededPad))) - len(Oracle12(nil))
+	blockLen := len(Oracle12(padding)) - len(Oracle12(nil))
+	if blockLen != 16 {
+		log.Fatalln("Did somethig wrong calculating the blockLen")
+	}
+
+	// 2. Detect that the function is using ECB. You already know, but do this step anyways.
 	modeUsed := IsEcb(Oracle12([]byte(strings.Repeat("A", 32))))
+	if modeUsed != true {
+		log.Fatalln("Did somethig wrong checking AES Mode")
+	}
 
-	log.Println(blockSize, modeUsed)
-
-	/*
-			var plaintext []byte
-			padding := strings.Repeat("A", 15)
-		    for i :=0; i < Length; i++ {
-
-		    }
-	*/
+	// 3. Byte-at-a-time ECB decryption
+	plainText := Byte2ByteDecrypt(targetLen - paddingLen)
+	plainText = strings.ReplaceAll(plainText, "\n", "\\n")
+	log.Printf("\t[ch 12] %s...", plainText[:80])
 }
