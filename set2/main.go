@@ -8,4 +8,6 @@ func Main() {
 	Challenge10()
 	Challenge11()
 	Challenge12()
+	Challenge13()
+	Challenge14()
 }

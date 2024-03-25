@@ -2,6 +2,7 @@ package set1
 
 import (
 	"crypto/aes"
+	"errors"
 	"log"
 	"strings"
 )
@@ -18,6 +19,27 @@ func Pkcs7(input []byte, targetLength int) []byte {
 	}
 
 	return output
+}
+
+func ValidatePkcs7(input []byte, paddingLen int) bool {
+	for i := 0; i < paddingLen; i++ {
+		if input[len(input)-i-1] != byte(paddingLen) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func RemovePkcs7(input []byte) ([]byte, error) {
+	var totalLen int = len(input)
+	var paddingLen int = int(input[totalLen-1])
+
+	if ValidatePkcs7(input, paddingLen) == false {
+		return nil, errors.New("Invalid padding")
+	}
+
+	return input[:totalLen-paddingLen], nil
 }
 
 func ECBEncrypt(input []byte, key []byte) []byte {

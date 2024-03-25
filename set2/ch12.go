@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Oracle12(input []byte) []byte {
+func oracle12(input []byte) []byte {
 	target := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
 	plaintext := append(input, set1.B64Decode(target)...)
 
@@ -16,8 +16,8 @@ func Oracle12(input []byte) []byte {
 func calcPaddingLen() (int, int) {
 	var padding string = ""
 
-	empty_length := len(Oracle12([]byte(padding)))
-	for empty_length == len(Oracle12([]byte(padding))) {
+	empty_length := len(oracle12([]byte(padding)))
+	for empty_length == len(oracle12([]byte(padding))) {
 		padding = padding + "A"
 	}
 
@@ -29,12 +29,12 @@ func matchByte(filler []byte, plain []byte, offset int) string {
 	pt := append(filler, plain...)
 	for i := 0; i < 256; i++ {
 		possiblePt := append(pt, byte(i))
-		ct := Oracle12(possiblePt)
+		ct := oracle12(possiblePt)
 
 		options[string(ct[offset:offset+16])] = byte(i)
 	}
 
-	ct := Oracle12(filler)
+	ct := oracle12(filler)
 	if val, ok := options[string(ct[offset:offset+16])]; ok {
 		return string(val)
 	}
@@ -76,13 +76,13 @@ func Challenge12() {
 	targetLen, paddingLen := calcPaddingLen()
 	padding := []byte(strings.Repeat("A", paddingLen))
 
-	blockLen := len(Oracle12(padding)) - len(Oracle12(nil))
+	blockLen := len(oracle12(padding)) - len(oracle12(nil))
 	if blockLen != 16 {
 		log.Fatalln("Did somethig wrong calculating the blockLen")
 	}
 
 	// 2. Detect that the function is using ECB. You already know, but do this step anyways.
-	modeUsed := IsEcb(Oracle12([]byte(strings.Repeat("A", 32))))
+	modeUsed := IsEcb(oracle12([]byte(strings.Repeat("A", 32))))
 	if modeUsed != true {
 		log.Fatalln("Did somethig wrong checking AES Mode")
 	}

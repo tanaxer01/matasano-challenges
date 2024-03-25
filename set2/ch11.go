@@ -25,7 +25,7 @@ func RandomBytes(input []byte) {
 	rand.Read(input)
 }
 
-func Oracle11(input []byte) ([]byte, bool) {
+func oracle11(input []byte) ([]byte, bool) {
 	var output []byte
 
 	prefixLen, err := RandomRange(5, 11)
@@ -77,7 +77,7 @@ func Challenge11() {
 	RandomBytes(IV)
 
 	input := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-	output, choice := Oracle11([]byte(input))
+	output, choice := oracle11([]byte(input))
 	res := IsEcb(output)
 
 	if res != choice {
