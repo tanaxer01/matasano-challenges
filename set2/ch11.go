@@ -2,9 +2,9 @@ package set2
 
 import (
 	"Matasano/set1"
+	"Matasano/utils"
 	"crypto/rand"
 	"log"
-	"math/big"
 )
 
 var (
@@ -12,27 +12,14 @@ var (
 	IV  = make([]byte, 16)
 )
 
-func RandomRange(min int, max int) (int, error) {
-	randInt, err := rand.Int(rand.Reader, big.NewInt(int64(max-min+1)))
-	if err != nil {
-		return 0, err
-	}
-
-	return min + int(randInt.Int64()), nil
-}
-
-func RandomBytes(input []byte) {
-	rand.Read(input)
-}
-
 func oracle11(input []byte) ([]byte, bool) {
 	var output []byte
 
-	prefixLen, err := RandomRange(5, 11)
+	prefixLen, err := utils.RandomRange(5, 11)
 	if err != nil {
 		log.Fatalf("Error generating random number: %s", err)
 	}
-	sufixLen, err := RandomRange(5, 11)
+	sufixLen, err := utils.RandomRange(5, 11)
 	if err != nil {
 		log.Fatalf("Error generating random number: %s", err)
 	}
@@ -44,7 +31,7 @@ func oracle11(input []byte) ([]byte, bool) {
 	rand.Read(sufix)
 
 	modedInput := append(append(prefix, input...), sufix...)
-	choice, err := RandomRange(0, 2)
+	choice, err := utils.RandomRange(0, 2)
 	if err != nil {
 		log.Fatalf("Error generating random number: %s", err)
 	}
@@ -73,8 +60,8 @@ func IsEcb(input []byte) bool {
 }
 
 func Challenge11() {
-	RandomBytes(KEY)
-	RandomBytes(IV)
+	utils.RandomBytes(KEY)
+	utils.RandomBytes(IV)
 
 	input := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 	output, choice := oracle11([]byte(input))

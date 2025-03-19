@@ -2,6 +2,7 @@ package set2
 
 import (
 	"Matasano/set1"
+	"Matasano/utils"
 	"fmt"
 	"log"
 	"strings"
@@ -30,7 +31,7 @@ func oracle13(user string) []byte {
 }
 
 func Challenge13() {
-	RandomBytes(KEY)
+	utils.RandomBytes(KEY)
 
 	var user string = "fooo@baar.com"
 	var fake []byte = set1.Pkcs7([]byte("admin"), 16)

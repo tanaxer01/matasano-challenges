@@ -2,6 +2,7 @@ package set2
 
 import (
 	"Matasano/set1"
+	"Matasano/utils"
 	"log"
 	"strings"
 )
@@ -70,7 +71,7 @@ func Byte2ByteDecrypt(targetLen int) string {
 }
 
 func Challenge12() {
-	RandomBytes(KEY)
+	utils.RandomBytes(KEY)
 
 	// 1. Discover the block size of the cipher. You know it, but do this step anyway.
 	targetLen, paddingLen := calcPaddingLen()
